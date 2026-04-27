@@ -1,9 +1,10 @@
 package com.example.jedicouncilchallenge.data.local
 
+import com.example.jedicouncilchallenge.domain.model.FavouriteRef
 import kotlinx.coroutines.flow.Flow
 
 interface FavouritesLocalDataSource {
-    fun observeFavouriteIds(): Flow<Set<FavouriteId>>
-    suspend fun saveFavouriteId(id: FavouriteId)
-    suspend fun removeFavouriteId(id: FavouriteId)
+    fun observeFavourites(): Flow<Set<FavouriteRef>>
+    suspend fun save(ref: FavouriteRef)
+    suspend fun remove(ref: FavouriteRef)
 }

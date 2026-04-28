@@ -28,9 +28,28 @@ class CharacterRepositoryImpl @Inject constructor(
 
     private val planetCache = mutableMapOf<Int, Planet>()
     private val starshipCache = mutableMapOf<Int, Starship>()
+    private var characterCache: List<Character> = emptyList()
 
-    override suspend fun getCharacters(): Result<List<Character>, DataError.Network> =
-        remoteDataSource.getCharacters().map { list -> list.map { it.toCharacter() } }
+    override suspend fun getCharacters(): Result<List<Character>, DataError.Network> {
+        if (characterCache.isNotEmpty()) return Result.Success(characterCache)
+        return remoteDataSource.getCharacters().map { list -> list.map { it.toCharacter() } }
+            .also { result ->
+                if (result is Result.Success) characterCache = result.data
+            }
+    }
+
+    override suspend fun getCharacter(id: Int): Result<Character, DataError.Network> {
+        if (characterCache.isEmpty()) {
+            when (val result = getCharacters()) {
+                is Result.Success -> characterCache = result.data
+                is Result.Error -> return result
+            }
+        }
+
+        return characterCache.firstOrNull { it.id == id }
+            ?.let { Result.Success(it) }
+            ?: Result.Error(DataError.Network.NOT_FOUND)
+    }
 
     override suspend fun getSpecies(): Result<List<Species>, DataError.Network> =
         remoteDataSource.getSpecies().map { list -> list.map { it.toSpecies() } }

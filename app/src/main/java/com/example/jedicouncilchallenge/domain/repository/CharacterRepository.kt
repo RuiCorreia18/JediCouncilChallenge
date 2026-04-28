@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.map
 
 interface CharacterRepository {
     suspend fun getCharacters(): Result<List<Character>, DataError.Network>
+    suspend fun getCharacter(id: Int): Result<Character, DataError.Network>
     suspend fun getSpecies(): Result<List<Species>, DataError.Network>
     suspend fun getPlanet(id: Int): Result<Planet, DataError.Network>
     suspend fun getStarship(id: Int): Result<Starship, DataError.Network>

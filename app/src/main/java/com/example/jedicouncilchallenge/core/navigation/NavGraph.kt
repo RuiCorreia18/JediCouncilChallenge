@@ -31,6 +31,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.jedicouncilchallenge.presentation.characters.CharacterListRoot
+import com.example.jedicouncilchallenge.presentation.compare.CompareRoot
 import com.example.jedicouncilchallenge.presentation.detail.CharacterDetailRoot
 import com.example.jedicouncilchallenge.presentation.favourites.FavouritesRoot
 import com.example.jedicouncilchallenge.presentation.theme.StarWarsColors
@@ -147,7 +148,7 @@ fun StarWarsNavGraph(
                     )
                 }
                 composable<CompareRoute> {
-                    // TODO: CompareRoot()
+                    CompareRoot()
                 }
             }
         }

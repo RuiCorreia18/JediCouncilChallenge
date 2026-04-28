@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -72,6 +74,7 @@ fun CharacterListRoot(
         onSearchQueryChange = viewModel::onSearchQueryChange,
         onSpeciesFilterChange = viewModel::onSpeciesFilterChange,
         onGenderFilterChange = viewModel::onGenderFilterChange,
+        onSortOptionChange = viewModel::onSortOptionChange,
         onCharacterClick = viewModel::onCharacterClick,
         onToggleFavourite = viewModel::onToggleFavourite,
         onLoadMore = viewModel::loadMore,
@@ -85,6 +88,7 @@ fun CharacterListScreen(
     onSearchQueryChange: (String) -> Unit,
     onSpeciesFilterChange: (String?) -> Unit,
     onGenderFilterChange: (String?) -> Unit,
+    onSortOptionChange: (CharacterSortOption) -> Unit,
     onCharacterClick: (Int) -> Unit,
     onToggleFavourite: (Int) -> Unit,
     onLoadMore: () -> Unit,
@@ -113,6 +117,11 @@ fun CharacterListScreen(
                 onSelect = onGenderFilterChange
             )
         }
+
+        SortControl(
+            selected = state.sortOption,
+            onSelect = onSortOptionChange
+        )
 
         Box(modifier = Modifier.weight(1f)) {
             when {
@@ -178,6 +187,81 @@ fun CharacterListScreen(
             }
         }
     }
+}
+
+@Composable
+private fun SortControl(
+    selected: CharacterSortOption,
+    onSelect: (CharacterSortOption) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val shape = RoundedCornerShape(22.dp)
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(shape)
+            .background(StarWarsColors.SurfaceOverlay)
+            .border(1.dp, StarWarsColors.Yellow.copy(alpha = 0.55f), shape)
+            .padding(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Filled.SortByAlpha,
+            contentDescription = null,
+            tint = StarWarsColors.Yellow,
+            modifier = Modifier
+                .padding(start = 10.dp)
+                .size(20.dp)
+        )
+        Text(
+            text = "Name",
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .weight(1f),
+            color = Color.White,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        CharacterSortOption.entries.forEach { option ->
+            SortSegment(
+                option = option,
+                selected = selected == option,
+                onClick = { onSelect(option) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun SortSegment(
+    option: CharacterSortOption,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val shape = RoundedCornerShape(16.dp)
+    Text(
+        text = option.label,
+        modifier = modifier
+            .padding(start = 4.dp)
+            .clip(shape)
+            .background(if (selected) StarWarsColors.Yellow else Color.Transparent)
+            .border(
+                width = 1.dp,
+                color = if (selected) StarWarsColors.Yellow else StarWarsColors.TextSecondary,
+                shape = shape
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        color = if (selected) StarWarsColors.Black else Color.White,
+        style = MaterialTheme.typography.labelLarge,
+        fontWeight = FontWeight.Black,
+        maxLines = 1
+    )
 }
 
 @Composable
@@ -353,13 +437,15 @@ private class CharacterListStatePreviewProvider : PreviewParameterProvider<Chara
             displayedCharacters = previewCharacters,
             availableSpecies = listOf("Human", "Droid", "Wookiee"),
             availableGenders = listOf("female", "male", "n/a"),
+            sortOption = CharacterSortOption.NameAscending,
             favouriteCharacterIds = setOf(1, 3),
             canLoadMore = true
         ),
         CharacterListState(
             searchQuery = "jar jar",
             availableSpecies = listOf("Human", "Droid", "Wookiee"),
-            availableGenders = listOf("female", "male", "n/a")
+            availableGenders = listOf("female", "male", "n/a"),
+            sortOption = CharacterSortOption.NameDescending
         ),
         CharacterListState(
             error = UiText.DynamicString("Unable to reach a galaxy far, far away."),
@@ -405,6 +491,7 @@ private fun CharacterListScreenPreview(
             onSearchQueryChange = {},
             onSpeciesFilterChange = {},
             onGenderFilterChange = {},
+            onSortOptionChange = {},
             onCharacterClick = {},
             onToggleFavourite = {},
             onLoadMore = {},

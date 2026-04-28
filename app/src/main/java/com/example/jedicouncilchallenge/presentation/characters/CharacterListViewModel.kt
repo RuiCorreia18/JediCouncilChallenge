@@ -91,6 +91,12 @@ class CharacterListViewModel @Inject constructor(
         updateDisplayedCharacters()
     }
 
+    fun onSortOptionChange(sortOption: CharacterSortOption) {
+        visibleCount = PAGE_SIZE
+        _state.update { it.copy(sortOption = sortOption) }
+        updateDisplayedCharacters()
+    }
+
     fun loadMore() {
         visibleCount += PAGE_SIZE
         updateDisplayedCharacters()
@@ -120,6 +126,7 @@ class CharacterListViewModel @Inject constructor(
         val query = _state.value.searchQuery
         val species = _state.value.selectedSpecies
         val gender = _state.value.selectedGender
+        val sortOption = _state.value.sortOption
 
         val filtered = allCharacters.filter { character ->
             val matchesSearch = query.isBlank() ||
@@ -129,7 +136,12 @@ class CharacterListViewModel @Inject constructor(
             val matchesGender = gender == null ||
                 character.gender.equals(gender, ignoreCase = true)
             matchesSearch && matchesSpecies && matchesGender
-        }.sortedBy { it.name }
+        }.let { characters ->
+            when (sortOption) {
+                CharacterSortOption.NameAscending -> characters.sortedBy { it.name }
+                CharacterSortOption.NameDescending -> characters.sortedByDescending { it.name }
+            }
+        }
 
         _state.update {
             it.copy(

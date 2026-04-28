@@ -11,11 +11,17 @@ data class CharacterListState(
     val searchQuery: String = "",
     val selectedSpecies: String? = null,
     val selectedGender: String? = null,
+    val sortOption: CharacterSortOption = CharacterSortOption.NameAscending,
     val availableSpecies: List<String> = emptyList(),
     val availableGenders: List<String> = emptyList(),
     val favouriteCharacterIds: Set<Int> = emptySet(),
     val canLoadMore: Boolean = false
 )
+
+enum class CharacterSortOption(val label: String) {
+    NameAscending("A-Z"),
+    NameDescending("Z-A")
+}
 
 data class CharacterUi(
     val id: Int,

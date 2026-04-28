@@ -4,7 +4,7 @@ import com.example.jedicouncilchallenge.data.remote.dto.CharacterDto
 import com.example.jedicouncilchallenge.domain.model.Character
 
 fun CharacterDto.toCharacter(): Character = Character(
-    id = id,
+    id = url.resourceId(),
     name = name,
     gender = gender,
     birthYear = birthYear,
@@ -13,8 +13,8 @@ fun CharacterDto.toCharacter(): Character = Character(
     hairColor = hairColor,
     skinColor = skinColor,
     eyeColor = eyeColor,
-    speciesIds = species,
-    filmIds = films,
-    starshipIds = starships,
-    homeworldId = homeworld
+    speciesIds = species.map { it.resourceId() },
+    filmIds = films.map { it.resourceId() },
+    starshipIds = starships.map { it.resourceId() },
+    homeworldId = homeworld.resourceIdOrNull()
 )

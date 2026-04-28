@@ -4,7 +4,7 @@ import com.example.jedicouncilchallenge.data.remote.dto.StarshipDto
 import com.example.jedicouncilchallenge.domain.model.Starship
 
 fun StarshipDto.toStarship(): Starship = Starship(
-    id = id,
+    id = url.resourceId(),
     name = name,
     model = model,
     manufacturer = manufacturer,

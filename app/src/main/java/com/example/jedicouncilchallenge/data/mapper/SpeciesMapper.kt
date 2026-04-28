@@ -4,6 +4,6 @@ import com.example.jedicouncilchallenge.data.remote.dto.SpeciesDto
 import com.example.jedicouncilchallenge.domain.model.Species
 
 fun SpeciesDto.toSpecies(): Species = Species(
-    id = id,
+    id = url.resourceId(),
     name = name
 )

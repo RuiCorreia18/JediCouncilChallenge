@@ -31,6 +31,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.jedicouncilchallenge.presentation.characters.CharacterListRoot
+import com.example.jedicouncilchallenge.presentation.detail.CharacterDetailRoot
 import com.example.jedicouncilchallenge.presentation.theme.StarWarsColors
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -134,7 +135,10 @@ fun StarWarsNavGraph(
                 }
                 composable<CharacterDetailRoute> { backStackEntry ->
                     val route: CharacterDetailRoute = backStackEntry.toRoute()
-                    // TODO: CharacterDetailRoot(characterId = route.characterId, onNavigateBack = { navController.popBackStack() })
+                    CharacterDetailRoot(
+                        characterId = route.characterId,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
                 }
                 composable<FavouritesRoute> {
                     // TODO: FavouritesRoot(onNavigateToDetail = { navController.navigate(CharacterDetailRoute(it)) })

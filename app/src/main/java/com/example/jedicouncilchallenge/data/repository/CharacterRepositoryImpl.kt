@@ -39,6 +39,8 @@ class CharacterRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getCharacter(id: Int): Result<Character, DataError.Network> {
+        // The list endpoint returns the same per-character shape as the per-id endpoint,
+        // so we populate the cache via getCharacters() rather than making a redundant per-id call.
         if (characterCache.isEmpty()) {
             when (val result = getCharacters()) {
                 is Result.Success -> characterCache = result.data

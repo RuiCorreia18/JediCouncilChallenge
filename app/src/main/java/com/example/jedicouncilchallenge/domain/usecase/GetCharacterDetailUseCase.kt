@@ -10,6 +10,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
+/**
+ * Resolves a character's homeworld and starships in parallel, with early-exit on any network error.
+ * The character itself is read from the in-memory list; only planets and starships require network calls.
+ */
 class GetCharacterDetailUseCase @Inject constructor(
     private val repository: CharacterRepository
 ) {

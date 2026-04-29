@@ -1,6 +1,5 @@
 package com.example.jedicouncilchallenge.presentation.compare
 
-import android.text.style.UnderlineSpan
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,6 +46,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.jedicouncilchallenge.R
 import com.example.jedicouncilchallenge.presentation.images.characterImageUrl
 import com.example.jedicouncilchallenge.presentation.theme.StarWarsColors
 import com.example.jedicouncilchallenge.presentation.theme.StarWarsTheme
@@ -122,7 +123,9 @@ fun CompareScreen(
             state.error != null -> {
                 val context = LocalContext.current
                 Column(
-                    modifier = Modifier.align(Alignment.Center).padding(16.dp),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -138,7 +141,7 @@ fun CompareScreen(
                             contentColor = StarWarsColors.Black
                         )
                     ) {
-                        Text("Retry", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.btn_retry), fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -213,7 +216,7 @@ private fun ComparePickerContent(
         Spacer(Modifier.height(12.dp))
 
         Text(
-            text = "VS",
+            text = stringResource(R.string.compare_vs),
             color = StarWarsColors.Yellow,
             fontSize = 28.sp,
             fontWeight = FontWeight.Black,
@@ -236,7 +239,7 @@ private fun ComparePickerContent(
                 )
             ) {
                 Text(
-                    text = "COMPARE",
+                    text = stringResource(R.string.btn_compare),
                     fontWeight = FontWeight.Black,
                     letterSpacing = 3.sp,
                     fontSize = 16.sp
@@ -252,7 +255,7 @@ private fun ComparePickerContent(
 private fun StarWarsLogoText() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = "STAR",
+            text = stringResource(R.string.compare_star),
             color = StarWarsColors.Yellow,
             fontSize = 36.sp,
             fontWeight = FontWeight.Black,
@@ -260,7 +263,7 @@ private fun StarWarsLogoText() {
             lineHeight = 36.sp
         )
         Text(
-            text = "WARS",
+            text = stringResource(R.string.compare_wars),
             color = StarWarsColors.Yellow,
             fontSize = 36.sp,
             fontWeight = FontWeight.Black,
@@ -290,7 +293,7 @@ private fun CharacterSlot(
         if (character == null) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Select character",
+                contentDescription = stringResource(R.string.cd_select_character),
                 tint = Color.White.copy(alpha = 0.7f),
                 modifier = Modifier.size(48.dp)
             )
@@ -321,11 +324,13 @@ private fun CharacterSlot(
             }
             IconButton(
                 onClick = onClear,
-                modifier = Modifier.align(Alignment.TopEnd).padding(4.dp)
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(4.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Clear",
+                    contentDescription = stringResource(R.string.cd_clear),
                     tint = Color.White,
                     modifier = Modifier
                         .size(20.dp)
@@ -385,7 +390,7 @@ private fun CompareResultScreen(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.cd_back),
                     tint = StarWarsColors.Yellow
                 )
             }
@@ -428,21 +433,37 @@ private fun CompareResultScreen(
                 .padding(horizontal = 24.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            CompareSection(title = "BIOGRAPHICAL INFORMATION") {
-                CompareStat("BIRTH YEAR", left.birthYear, right.birthYear)
-                CompareStat("FILMS", left.filmCount.toString(), right.filmCount.toString())
-                CompareStat("STARSHIPS", left.starshipCount.toString(), right.starshipCount.toString())
+            CompareSection(title = stringResource(R.string.section_biographical)) {
+                CompareStat(
+                    stringResource(R.string.stat_birth_year),
+                    left.birthYear,
+                    right.birthYear
+                )
+                CompareStat(
+                    stringResource(R.string.stat_films),
+                    left.filmCount.toString(),
+                    right.filmCount.toString()
+                )
+                CompareStat(
+                    stringResource(R.string.stat_starships),
+                    left.starshipCount.toString(),
+                    right.starshipCount.toString()
+                )
             }
 
             Spacer(Modifier.height(8.dp))
 
-            CompareSection(title = "PHYSICAL DESCRIPTION") {
-                CompareStat("SPECIES", left.speciesName, right.speciesName)
-                CompareStat("GENDER", left.gender, right.gender)
-                CompareStat("MASS", left.mass, right.mass)
-                CompareStat("HEIGHT", left.height, right.height)
-                CompareStat("HAIR", left.hairColor, right.hairColor)
-                CompareStat("EYES", left.eyeColor, right.eyeColor)
+            CompareSection(title = stringResource(R.string.section_physical)) {
+                CompareStat(
+                    stringResource(R.string.stat_species),
+                    left.speciesName,
+                    right.speciesName
+                )
+                CompareStat(stringResource(R.string.stat_gender), left.gender, right.gender)
+                CompareStat(stringResource(R.string.stat_mass), left.mass, right.mass)
+                CompareStat(stringResource(R.string.stat_height), left.height, right.height)
+                CompareStat(stringResource(R.string.stat_hair), left.hairColor, right.hairColor)
+                CompareStat(stringResource(R.string.stat_eyes), left.eyeColor, right.eyeColor)
             }
 
             Spacer(Modifier.height(24.dp))
@@ -543,7 +564,7 @@ private fun CharacterPickerSheet(
             .padding(horizontal = 16.dp)
     ) {
         Text(
-            text = "SELECT CHARACTER",
+            text = stringResource(R.string.compare_select_character),
             color = StarWarsColors.Yellow,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Black,
@@ -557,7 +578,12 @@ private fun CharacterPickerSheet(
             value = query,
             onValueChange = onQueryChange,
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Search character…", color = StarWarsColors.TextSecondary) },
+            placeholder = {
+                Text(
+                    stringResource(R.string.search_hint_character),
+                    color = StarWarsColors.TextSecondary
+                )
+            },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             colors = TextFieldDefaults.colors(
@@ -572,7 +598,9 @@ private fun CharacterPickerSheet(
         )
         Spacer(Modifier.height(8.dp))
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().height(360.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(360.dp),
             verticalArrangement = Arrangement.spacedBy(1.dp)
         ) {
             items(suggestions, key = { it.id }) { character ->

@@ -32,20 +32,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.jedicouncilchallenge.R
 import com.example.jedicouncilchallenge.domain.model.Character
 import com.example.jedicouncilchallenge.domain.model.Planet
 import com.example.jedicouncilchallenge.domain.model.Starship
@@ -153,7 +153,7 @@ private fun CharacterDetailContent(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.cd_back),
                     tint = StarWarsColors.Yellow
                 )
             }
@@ -165,7 +165,7 @@ private fun CharacterDetailContent(
             ) {
                 CircleIconButton(
                     icon = if (state.isFavourite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                    contentDescription = if (state.isFavourite) "Remove from favourites" else "Add to favourites",
+                    contentDescription = stringResource(if (state.isFavourite) R.string.cd_remove_favourite else R.string.cd_add_favourite),
                     onClick = onToggleFavourite
                 )
             }
@@ -188,27 +188,28 @@ private fun CharacterDetailContent(
                 overflow = TextOverflow.Ellipsis
             )
 
-            DetailSectionTitle("BIOGRAPHICAL INFORMATION")
+            DetailSectionTitle(stringResource(R.string.section_biographical))
             CenteredFactRows(
                 rows = listOf(
-                    "Homeworld" to (state.homeworld?.name ?: "Unknown"),
-                    "Born" to character.birthYear.displayValue(),
-                    "Films" to character.filmIds.size.toString()
+                    stringResource(R.string.label_homeworld) to (state.homeworld?.name
+                        ?: stringResource(R.string.value_unknown)),
+                    stringResource(R.string.label_born) to character.birthYear.displayValue(),
+                    stringResource(R.string.label_films) to character.filmIds.size.toString()
                 )
             )
 
-            DetailSectionTitle("PHYSICAL DESCRIPTION")
+            DetailSectionTitle(stringResource(R.string.section_physical))
             CenteredFactRows(
                 rows = listOf(
-                    "Gender" to character.gender.displayValue(),
-                    "Height" to character.height.withUnit("meters"),
-                    "Mass" to character.mass.withUnit("kilograms"),
-                    "Eyes" to character.eyeColor.displayValue(),
-                    "Hair" to character.hairColor.displayValue()
+                    stringResource(R.string.label_gender) to character.gender.displayValue(),
+                    stringResource(R.string.label_height) to character.height.withUnit("meters"),
+                    stringResource(R.string.label_mass) to character.mass.withUnit("kilograms"),
+                    stringResource(R.string.label_eyes) to character.eyeColor.displayValue(),
+                    stringResource(R.string.label_hair) to character.hairColor.displayValue()
                 )
             )
 
-            DetailSectionTitle("STORY")
+            DetailSectionTitle(stringResource(R.string.section_story))
             StoryText(
                 text = character.storySummary(
                     homeworldName = state.homeworld?.name,
@@ -333,7 +334,7 @@ private fun ErrorState(
                 contentColor = StarWarsColors.Black
             )
         ) {
-            Text("Retry", fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.btn_retry), fontWeight = FontWeight.Bold)
         }
     }
 }

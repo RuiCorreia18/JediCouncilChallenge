@@ -31,9 +31,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.jedicouncilchallenge.R
 import com.example.jedicouncilchallenge.core.presentation.ObserveAsEvents
-import com.example.jedicouncilchallenge.core.presentation.UiText
 import com.example.jedicouncilchallenge.presentation.images.characterImageUrl
 import com.example.jedicouncilchallenge.presentation.theme.StarWarsColors
 import com.example.jedicouncilchallenge.presentation.theme.StarWarsTheme
@@ -83,6 +83,7 @@ fun FavouritesScreen(
                     color = StarWarsColors.Yellow
                 )
             }
+
             state.error != null -> {
                 val context = LocalContext.current
                 ErrorState(
@@ -91,9 +92,11 @@ fun FavouritesScreen(
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
+
             state.characters.isEmpty() -> {
                 EmptyState(modifier = Modifier.align(Alignment.Center))
             }
+
             else -> {
                 LazyColumn(
                     contentPadding = PaddingValues(horizontal = 32.dp, vertical = 24.dp),
@@ -101,7 +104,7 @@ fun FavouritesScreen(
                 ) {
                     item {
                         Text(
-                            text = "FAVOURITES",
+                            text = stringResource(R.string.screen_favourites),
                             modifier = Modifier.fillMaxWidth(),
                             color = StarWarsColors.Yellow,
                             style = MaterialTheme.typography.displaySmall,
@@ -192,13 +195,13 @@ private fun EmptyState(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "NO FAVOURITES",
+            text = stringResource(R.string.empty_no_favourites),
             color = StarWarsColors.Yellow,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Black
         )
         Text(
-            text = "Mark characters with the star to keep them here.",
+            text = stringResource(R.string.empty_no_favourites_hint),
             color = StarWarsColors.TextSecondary,
             style = MaterialTheme.typography.bodyMedium
         )

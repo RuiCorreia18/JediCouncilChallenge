@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.jedicouncilchallenge.R
 import com.example.jedicouncilchallenge.core.presentation.ObserveAsEvents
 import com.example.jedicouncilchallenge.core.presentation.UiText
 import com.example.jedicouncilchallenge.presentation.images.characterImageUrl
@@ -103,7 +105,7 @@ fun CharacterListScreen(
 
         if (state.availableSpecies.isNotEmpty()) {
             FilterRow(
-                label = "Species",
+                label = stringResource(R.string.filter_label_species),
                 options = state.availableSpecies,
                 selected = state.selectedSpecies,
                 onSelect = onSpeciesFilterChange
@@ -112,7 +114,7 @@ fun CharacterListScreen(
 
         if (state.availableGenders.isNotEmpty()) {
             FilterRow(
-                label = "Gender",
+                label = stringResource(R.string.filter_label_gender),
                 options = state.availableGenders,
                 selected = state.selectedGender,
                 onSelect = onGenderFilterChange
@@ -150,7 +152,7 @@ fun CharacterListScreen(
                     ) {
                         item {
                             Text(
-                                text = "CHARACTERS",
+                                text = stringResource(R.string.screen_characters),
                                 modifier = Modifier.fillMaxWidth(),
                                 color = StarWarsColors.Yellow,
                                 style = MaterialTheme.typography.displaySmall,
@@ -179,7 +181,10 @@ fun CharacterListScreen(
                                         contentColor = StarWarsColors.Black
                                     )
                                 ) {
-                                    Text("Load more", fontWeight = FontWeight.Bold)
+                                    Text(
+                                        stringResource(R.string.btn_load_more),
+                                        fontWeight = FontWeight.Bold
+                                    )
                                 }
                             }
                         }
@@ -217,7 +222,7 @@ private fun SortControl(
                 .size(20.dp)
         )
         Text(
-            text = "Name",
+            text = stringResource(R.string.sort_label_name),
             modifier = Modifier
                 .padding(horizontal = 10.dp)
                 .weight(1f),
@@ -277,7 +282,12 @@ private fun SearchBar(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        placeholder = { Text("Search characters…", color = StarWarsColors.TextSecondary) },
+        placeholder = {
+            Text(
+                stringResource(R.string.search_hint_characters),
+                color = StarWarsColors.TextSecondary
+            )
+        },
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
         colors = TextFieldDefaults.colors(
@@ -308,7 +318,7 @@ private fun FilterRow(
             FilterChip(
                 selected = selected == null,
                 onClick = { onSelect(null) },
-                label = { Text("All $label") },
+                label = { Text(stringResource(R.string.filter_all, label)) },
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = StarWarsColors.Yellow,
                     selectedLabelColor = StarWarsColors.Black
@@ -371,7 +381,7 @@ private fun CharacterCard(
             ) {
                 Icon(
                     imageVector = if (isFavourite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                    contentDescription = if (isFavourite) "Remove from favourites" else "Add to favourites",
+                    contentDescription = stringResource(if (isFavourite) R.string.cd_remove_favourite else R.string.cd_add_favourite),
                     tint = if (isFavourite) StarWarsColors.Yellow else Color.White,
                     modifier = Modifier.size(24.dp)
                 )
@@ -415,7 +425,7 @@ private fun ErrorState(
                 contentColor = StarWarsColors.Black
             )
         ) {
-            Text("Retry", fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.btn_retry), fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -423,7 +433,7 @@ private fun ErrorState(
 @Composable
 private fun EmptyState(modifier: Modifier = Modifier) {
     Text(
-        text = "No characters found",
+        text = stringResource(R.string.empty_no_characters),
         modifier = modifier,
         color = StarWarsColors.TextSecondary,
         style = MaterialTheme.typography.bodyLarge

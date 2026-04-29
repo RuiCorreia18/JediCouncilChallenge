@@ -7,4 +7,79 @@
     <string name="error_server">Server error. Try again later</string>
     <string name="error_not_found">Content not found</string>
     <string name="error_unknown">Something went wrong</string>
+
+    <!-- Navigation drawer -->
+    <string name="nav_compare">COMPARE</string>
+    <string name="nav_favorites">FAVORITES</string>
+    <string name="nav_logout">LOGOUT</string>
+    <string name="cd_close_menu">Close menu</string>
+    <string name="cd_open_menu">Menu</string>
+    <string name="cd_yoda">Yoda</string>
+    <string name="cd_darth_vader">Darth Vader</string>
+
+    <!-- Screen titles -->
+    <string name="screen_characters">CHARACTERS</string>
+    <string name="screen_favourites">FAVOURITES</string>
+
+    <!-- Buttons -->
+    <string name="btn_retry">Retry</string>
+    <string name="btn_load_more">Load more</string>
+    <string name="btn_compare">COMPARE</string>
+
+    <!-- Search -->
+    <string name="search_hint_characters">Search characters…</string>
+    <string name="search_hint_character">Search character…</string>
+
+    <!-- Filters and sort -->
+    <string name="filter_label_species">Species</string>
+    <string name="filter_label_gender">Gender</string>
+    <string name="filter_all">All %s</string>
+    <string name="sort_label_name">Name</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_back">Back</string>
+    <string name="cd_add_favourite">Add to favourites</string>
+    <string name="cd_remove_favourite">Remove from favourites</string>
+    <string name="cd_select_character">Select character</string>
+    <string name="cd_clear">Clear</string>
+
+    <!-- Empty states -->
+    <string name="empty_no_characters">No characters found</string>
+    <string name="empty_no_favourites">NO FAVOURITES</string>
+    <string name="empty_no_favourites_hint">Mark characters with the star to keep them here.</string>
+
+    <!-- Compare screen -->
+    <string name="compare_vs">VS</string>
+    <string name="compare_star">STAR</string>
+    <string name="compare_wars">WARS</string>
+    <string name="compare_select_character">SELECT CHARACTER</string>
+
+    <!-- Section titles (shared by Detail and Compare) -->
+    <string name="section_biographical">BIOGRAPHICAL INFORMATION</string>
+    <string name="section_physical">PHYSICAL DESCRIPTION</string>
+    <string name="section_story">STORY</string>
+
+    <!-- Detail fact labels -->
+    <string name="label_homeworld">Homeworld</string>
+    <string name="label_born">Born</string>
+    <string name="label_films">Films</string>
+    <string name="label_gender">Gender</string>
+    <string name="label_height">Height</string>
+    <string name="label_mass">Mass</string>
+    <string name="label_eyes">Eyes</string>
+    <string name="label_hair">Hair</string>
+
+    <!-- Compare stat labels (all-caps, shown as column headers) -->
+    <string name="stat_birth_year">BIRTH YEAR</string>
+    <string name="stat_films">FILMS</string>
+    <string name="stat_starships">STARSHIPS</string>
+    <string name="stat_species">SPECIES</string>
+    <string name="stat_gender">GENDER</string>
+    <string name="stat_mass">MASS</string>
+    <string name="stat_height">HEIGHT</string>
+    <string name="stat_hair">HAIR</string>
+    <string name="stat_eyes">EYES</string>
+
+    <!-- Fallback values -->
+    <string name="value_unknown">Unknown</string>
 </resources>

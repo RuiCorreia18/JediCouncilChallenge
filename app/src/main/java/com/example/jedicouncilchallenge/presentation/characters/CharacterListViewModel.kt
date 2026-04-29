@@ -10,6 +10,7 @@ import com.example.jedicouncilchallenge.domain.model.FavouriteType
 import com.example.jedicouncilchallenge.domain.repository.CharacterRepository
 import com.example.jedicouncilchallenge.domain.usecase.GetCharactersUseCase
 import com.example.jedicouncilchallenge.domain.usecase.ToggleFavouriteUseCase
+import com.example.jedicouncilchallenge.presentation.images.characterImageUrl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,6 @@ sealed interface CharacterListEvent {
 }
 
 private const val PAGE_SIZE = 20
-private const val IMAGE_BASE_URL = "https://starwars-visualguide.com/assets/img/characters/"
 
 @HiltViewModel
 class CharacterListViewModel @Inject constructor(
@@ -74,7 +74,7 @@ class CharacterListViewModel @Inject constructor(
     }
 
     fun onSearchQueryChange(query: String) {
-        visibleCount = PAGE_SIZE
+        visibleCount = PAGE_SIZE // reset pagination — a new filter set starts from page 1
         _state.update { it.copy(searchQuery = query) }
         updateDisplayedCharacters()
     }
@@ -155,7 +155,7 @@ class CharacterListViewModel @Inject constructor(
     private fun Character.toCharacterUi(speciesMap: Map<Int, String>) = CharacterUi(
         id = id,
         name = name,
-        imageUrl = "$IMAGE_BASE_URL$id.jpg",
+        imageUrl = characterImageUrl(id),
         speciesName = speciesIds.firstOrNull()?.let { speciesMap[it] } ?: "Unknown"
     )
 }

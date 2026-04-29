@@ -49,10 +49,9 @@ import coil.compose.AsyncImage
 import com.example.jedicouncilchallenge.domain.model.Character
 import com.example.jedicouncilchallenge.domain.model.Planet
 import com.example.jedicouncilchallenge.domain.model.Starship
+import com.example.jedicouncilchallenge.presentation.images.characterImageUrl
 import com.example.jedicouncilchallenge.presentation.theme.StarWarsColors
 import com.example.jedicouncilchallenge.presentation.theme.StarWarsTheme
-
-private const val IMAGE_BASE_URL = "https://starwars-visualguide.com/assets/img/characters/"
 
 @Composable
 fun CharacterDetailRoot(
@@ -133,13 +132,14 @@ private fun CharacterDetailContent(
                 .height(300.dp)
         ) {
             AsyncImage(
-                model = "$IMAGE_BASE_URL${character.id}.jpg",
+                model = characterImageUrl(character.id),
                 contentDescription = character.name,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(300.dp)
-                    .clip(imageShape),
-                contentScale = ContentScale.Crop
+                    .clip(imageShape)
+                    .background(StarWarsColors.Black),
+                contentScale = ContentScale.Fit
             )
             IconButton(
                 onClick = onNavigateBack,

@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.jedicouncilchallenge.presentation.images.characterImageUrl
 import com.example.jedicouncilchallenge.presentation.theme.StarWarsColors
 import com.example.jedicouncilchallenge.presentation.theme.StarWarsTheme
 
@@ -297,8 +298,10 @@ private fun CharacterSlot(
             AsyncImage(
                 model = character.imageUrl,
                 contentDescription = character.name,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(StarWarsColors.Black),
+                contentScale = ContentScale.Fit
             )
             Box(
                 modifier = Modifier
@@ -357,14 +360,20 @@ private fun CompareResultScreen(
                 AsyncImage(
                     model = left.imageUrl,
                     contentDescription = left.name,
-                    modifier = Modifier.weight(1f).fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize()
+                        .background(StarWarsColors.Black),
+                    contentScale = ContentScale.Fit
                 )
                 AsyncImage(
                     model = right.imageUrl,
                     contentDescription = right.name,
-                    modifier = Modifier.weight(1f).fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize()
+                        .background(StarWarsColors.Black),
+                    contentScale = ContentScale.Fit
                 )
             }
             IconButton(
@@ -582,7 +591,7 @@ private fun CharacterPickerSheet(
                             .size(44.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(StarWarsColors.SurfaceOverlay),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Fit
                     )
                     Text(
                         text = character.name,
@@ -630,14 +639,14 @@ private fun CompareResultPreview() {
 
 private val previewLuke = CompareCharacterUi(
     id = 1, name = "Luke Skywalker", speciesName = "Human",
-    imageUrl = "https://starwars-visualguide.com/assets/img/characters/1.jpg",
+    imageUrl = characterImageUrl(1),
     gender = "Male", birthYear = "19BBY", height = "172", mass = "77",
     hairColor = "Blond", eyeColor = "Blue", starshipCount = 2, filmCount = 4
 )
 
 private val previewVader = CompareCharacterUi(
     id = 4, name = "Darth Vader", speciesName = "Human",
-    imageUrl = "https://starwars-visualguide.com/assets/img/characters/4.jpg",
+    imageUrl = characterImageUrl(4),
     gender = "Male", birthYear = "41.9BBY", height = "202", mass = "136",
     hairColor = "None", eyeColor = "Yellow", starshipCount = 1, filmCount = 4
 )

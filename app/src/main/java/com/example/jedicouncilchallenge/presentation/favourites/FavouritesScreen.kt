@@ -43,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.jedicouncilchallenge.core.presentation.ObserveAsEvents
 import com.example.jedicouncilchallenge.core.presentation.UiText
+import com.example.jedicouncilchallenge.presentation.images.characterImageUrl
 import com.example.jedicouncilchallenge.presentation.theme.StarWarsColors
 import com.example.jedicouncilchallenge.presentation.theme.StarWarsTheme
 
@@ -145,10 +146,11 @@ private fun FavouriteCharacterCard(
                 contentDescription = character.name,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(190.dp)
+                    .height(210.dp)
                     .clip(imageShape)
+                    .background(StarWarsColors.Black)
                     .border(1.dp, StarWarsColors.Yellow, imageShape),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Fit
             )
             IconButton(
                 onClick = onRemoveFavourite,
@@ -241,12 +243,12 @@ private fun FavouritesScreenPreview() {
                     FavouriteCharacterUi(
                         id = 1,
                         name = "Luke Skywalker",
-                        imageUrl = "https://starwars-visualguide.com/assets/img/characters/1.jpg"
+                        imageUrl = characterImageUrl(1)
                     ),
                     FavouriteCharacterUi(
                         id = 4,
                         name = "Darth Vader",
-                        imageUrl = "https://starwars-visualguide.com/assets/img/characters/4.jpg"
+                        imageUrl = characterImageUrl(4)
                     )
                 )
             ),

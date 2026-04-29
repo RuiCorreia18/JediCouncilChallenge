@@ -7,6 +7,7 @@ import com.example.jedicouncilchallenge.core.presentation.toUiText
 import com.example.jedicouncilchallenge.core.presentation.UiText
 import com.example.jedicouncilchallenge.domain.model.Character
 import com.example.jedicouncilchallenge.domain.repository.CharacterRepository
+import com.example.jedicouncilchallenge.presentation.images.characterImageUrl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -15,8 +16,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-private const val IMAGE_BASE_URL = "https://starwars-visualguide.com/assets/img/characters/"
 
 @HiltViewModel
 class CompareViewModel @Inject constructor(
@@ -156,7 +155,7 @@ class CompareViewModel @Inject constructor(
     private fun Character.toCompareCharacterUi(speciesMap: Map<Int, String>) = CompareCharacterUi(
         id = id,
         name = name,
-        imageUrl = "$IMAGE_BASE_URL$id.jpg",
+        imageUrl = characterImageUrl(id),
         speciesName = speciesIds.firstOrNull()?.let { speciesMap[it] } ?: "Human",
         gender = gender.displayValue(),
         birthYear = birthYear.displayValue(),

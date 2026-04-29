@@ -9,6 +9,7 @@ import com.example.jedicouncilchallenge.domain.model.FavouriteRef
 import com.example.jedicouncilchallenge.domain.model.FavouriteType
 import com.example.jedicouncilchallenge.domain.repository.CharacterRepository
 import com.example.jedicouncilchallenge.domain.usecase.ToggleFavouriteUseCase
+import com.example.jedicouncilchallenge.presentation.images.characterImageUrl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,8 +22,6 @@ import javax.inject.Inject
 sealed interface FavouritesEvent {
     data class NavigateToDetail(val characterId: Int) : FavouritesEvent
 }
-
-private const val IMAGE_BASE_URL = "https://starwars-visualguide.com/assets/img/characters/"
 
 @HiltViewModel
 class FavouritesViewModel @Inject constructor(
@@ -99,6 +98,6 @@ class FavouritesViewModel @Inject constructor(
     private fun Character.toFavouriteCharacterUi() = FavouriteCharacterUi(
         id = id,
         name = name,
-        imageUrl = "$IMAGE_BASE_URL$id.jpg"
+        imageUrl = characterImageUrl(id)
     )
 }

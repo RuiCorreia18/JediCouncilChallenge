@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -35,10 +36,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -139,7 +142,24 @@ fun CharacterListScreen(
                     EmptyState(modifier = Modifier.align(Alignment.Center))
                 }
                 else -> {
+                    val listState = rememberLazyListState()
+
+                    // Trigger loadMore when the user scrolls within 3 items of the end
+                    LaunchedEffect(listState, state.canLoadMore) {
+                        snapshotFlow {
+                            listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+                        }.collect { lastVisibleIndex ->
+                            if (state.canLoadMore &&
+                                lastVisibleIndex != null &&
+                                lastVisibleIndex >= listState.layoutInfo.totalItemsCount - 3
+                            ) {
+                                onLoadMore()
+                            }
+                        }
+                    }
+
                     LazyColumn(
+                        state = listState,
                         contentPadding = PaddingValues(horizontal = 32.dp, vertical = 24.dp),
                         verticalArrangement = Arrangement.spacedBy(28.dp)
                     ) {
@@ -164,20 +184,13 @@ fun CharacterListScreen(
 
                         if (state.canLoadMore) {
                             item {
-                                Button(
-                                    onClick = onLoadMore,
+                                Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 8.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = StarWarsColors.Yellow,
-                                        contentColor = StarWarsColors.Black
-                                    )
+                                        .padding(vertical = 16.dp),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Text(
-                                        stringResource(R.string.btn_load_more),
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                    CircularProgressIndicator(color = StarWarsColors.Yellow)
                                 }
                             }
                         }

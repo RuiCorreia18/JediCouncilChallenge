@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import coil.compose.AsyncImage
@@ -76,6 +77,9 @@ fun StarWarsNavGraph(
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val currentEntry = navController.currentBackStackEntryAsState().value
+    val isDetailScreen = currentEntry?.destination?.route
+        ?.startsWith(CharacterDetailRoute::class.qualifiedName.orEmpty()) == true
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -148,7 +152,7 @@ fun StarWarsNavGraph(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                        .padding(top = 16.dp, bottom = 150.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -183,22 +187,24 @@ fun StarWarsNavGraph(
     ) {
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = { Text("Star Wars") },
-                    navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(
-                                Icons.Default.Menu,
-                                contentDescription = stringResource(R.string.cd_open_menu)
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,
-                        titleContentColor = StarWarsColors.Yellow,
-                        navigationIconContentColor = StarWarsColors.Yellow
+                if (!isDetailScreen) {
+                    TopAppBar(
+                        title = { Text("Star Wars") },
+                        navigationIcon = {
+                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                                Icon(
+                                    Icons.Default.Menu,
+                                    contentDescription = stringResource(R.string.cd_open_menu)
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Transparent,
+                            titleContentColor = StarWarsColors.Yellow,
+                            navigationIconContentColor = StarWarsColors.Yellow
+                        )
                     )
-                )
+                }
             },
             containerColor = Color.Transparent
         ) { innerPadding ->

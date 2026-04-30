@@ -1,7 +1,6 @@
 package com.example.jedicouncilchallenge.presentation.detail
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +39,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -123,8 +124,6 @@ private fun CharacterDetailContent(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 12.dp, vertical = 12.dp)
             .clip(screenShape)
-            .background(StarWarsColors.Black)
-            .border(1.dp, StarWarsColors.Yellow.copy(alpha = 0.55f), screenShape)
     ) {
         Box(
             modifier = Modifier
@@ -141,34 +140,24 @@ private fun CharacterDetailContent(
                     .background(StarWarsColors.Black),
                 contentScale = ContentScale.Fit
             )
-            IconButton(
+            // Back button overlaid on image — top-left
+            CircleIconButton(
+                icon = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(R.string.cd_back),
                 onClick = onNavigateBack,
                 modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .padding(start = 18.dp)
-                    .size(46.dp)
-                    .clip(CircleShape)
-                    .background(StarWarsColors.Black)
-                    .border(1.dp, StarWarsColors.Yellow.copy(alpha = 0.6f), CircleShape)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.cd_back),
-                    tint = StarWarsColors.Yellow
-                )
-            }
-            Row(
+                    .align(Alignment.TopStart)
+                    .padding(start = 14.dp, top = 14.dp)
+            )
+            // Favourite button overlaid on image — bottom-right
+            CircleIconButton(
+                icon = if (state.isFavourite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                contentDescription = stringResource(if (state.isFavourite) R.string.cd_remove_favourite else R.string.cd_add_favourite),
+                onClick = onToggleFavourite,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 20.dp, bottom = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                CircleIconButton(
-                    icon = if (state.isFavourite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                    contentDescription = stringResource(if (state.isFavourite) R.string.cd_remove_favourite else R.string.cd_add_favourite),
-                    onClick = onToggleFavourite
-                )
-            }
+                    .padding(end = 14.dp, bottom = 14.dp)
+            )
         }
 
         Column(
@@ -208,6 +197,53 @@ private fun CharacterDetailContent(
                     stringResource(R.string.label_hair) to character.hairColor.displayValue()
                 )
             )
+
+            // Homeworld full details — only rendered when the planet was successfully fetched
+            state.homeworld?.let { planet ->
+                DetailSectionTitle(stringResource(R.string.section_homeworld))
+                CenteredFactRows(
+                    rows = listOf(
+                        stringResource(R.string.label_homeworld) to planet.name.displayValue(),
+                        stringResource(R.string.label_climate) to planet.climate.displayValue(),
+                        stringResource(R.string.label_terrain) to planet.terrain.displayValue(),
+                        stringResource(R.string.label_population) to planet.population.displayValue()
+                    )
+                )
+            }
+
+            DetailSectionTitle(stringResource(R.string.section_starships))
+            if (state.starships.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.section_no_starships),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    color = StarWarsColors.TextSecondary,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+            } else {
+                state.starships.forEach { ship ->
+                    Text(
+                        text = ship.name.uppercase(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 14.dp, bottom = 4.dp),
+                        color = StarWarsColors.Yellow.copy(alpha = 0.75f),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Black,
+                        textAlign = TextAlign.Center
+                    )
+                    CenteredFactRows(
+                        rows = listOf(
+                            stringResource(R.string.label_model) to ship.model.displayValue(),
+                            stringResource(R.string.label_manufacturer) to ship.manufacturer.displayValue(),
+                            stringResource(R.string.label_class) to ship.starshipClass.displayValue()
+                        )
+                    )
+                }
+            }
 
             DetailSectionTitle(stringResource(R.string.section_story))
             StoryText(
@@ -359,33 +395,68 @@ private fun String.displayValue(): String =
 private fun String.withUnit(unit: String): String =
     if (equals("unknown", ignoreCase = true)) "Unknown" else "$this $unit"
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
+private val previewCharacter = Character(
+    id = 1,
+    name = "Luke Skywalker",
+    gender = "male",
+    birthYear = "19BBY",
+    height = "1.72",
+    mass = "73",
+    hairColor = "blond",
+    skinColor = "fair",
+    eyeColor = "blue",
+    speciesIds = emptyList(),
+    filmIds = listOf(1, 2, 3, 6),
+    starshipIds = listOf(12, 22),
+    homeworldId = 1
+)
+
+private class CharacterDetailStatePreviewProvider : PreviewParameterProvider<CharacterDetailState> {
+    override val values = sequenceOf(
+        // Loading
+        CharacterDetailState(isLoading = true),
+        // Error
+        CharacterDetailState(
+            error = com.example.jedicouncilchallenge.core.presentation.UiText.DynamicString(
+                "Unable to reach a galaxy far, far away."
+            )
+        ),
+        // Data — homeworld still loading, no starships
+        CharacterDetailState(
+            character = previewCharacter,
+            isFavourite = false
+        ),
+        // Data — fully loaded, favourite, starships present
+        CharacterDetailState(
+            character = previewCharacter,
+            homeworld = Planet(1, "Tatooine", "arid", "desert", "200000"),
+            starships = listOf(
+                Starship(12, "X-wing", "T-65 X-wing", "Incom Corporation", "Starfighter"),
+                Starship(
+                    22,
+                    "Imperial Shuttle",
+                    "Lambda-class T-4a",
+                    "Sienar Fleet",
+                    "Armed government transport"
+                )
+            ),
+            isFavourite = true
+        )
+    )
+}
+
+@Preview(
+    name = "Character Detail States",
+    showBackground = true,
+    backgroundColor = 0xFF000000
+)
 @Composable
-private fun CharacterDetailScreenPreview() {
+private fun CharacterDetailScreenPreview(
+    @PreviewParameter(CharacterDetailStatePreviewProvider::class) state: CharacterDetailState
+) {
     StarWarsTheme {
         CharacterDetailScreen(
-            state = CharacterDetailState(
-                character = Character(
-                    id = 1,
-                    name = "Luke Skywalker",
-                    gender = "male",
-                    birthYear = "19BBY",
-                    height = "1.72",
-                    mass = "73",
-                    hairColor = "blond",
-                    skinColor = "fair",
-                    eyeColor = "blue",
-                    speciesIds = emptyList(),
-                    filmIds = listOf(1, 2, 3, 6),
-                    starshipIds = listOf(12, 22),
-                    homeworldId = 1
-                ),
-                homeworld = Planet(1, "Tatooine", "arid", "desert", "200000"),
-                starships = listOf(
-                    Starship(12, "X-wing", "T-65 X-wing", "Incom Corporation", "Starfighter")
-                ),
-                isFavourite = true
-            ),
+            state = state,
             onNavigateBack = {},
             onToggleFavourite = {},
             onRetry = {}

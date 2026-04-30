@@ -9,7 +9,6 @@ import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.example.jedicouncilchallenge.domain.model.Character
-import com.example.jedicouncilchallenge.domain.model.Species
 import com.example.jedicouncilchallenge.domain.usecase.GetCharactersUseCase
 import com.example.jedicouncilchallenge.domain.usecase.ToggleFavouriteUseCase
 import com.example.jedicouncilchallenge.fake.FakeCharacterRepository
@@ -96,6 +95,24 @@ class CharacterListViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `birth year sort orders characters by timeline year`() = runTest {
+        val repo = FakeCharacterRepository(
+            characters = listOf(
+                sampleCharacter.copy(id = 1, name = "Luke Skywalker", birthYear = "19BBY"),
+                sampleCharacter.copy(id = 2, name = "Yoda", birthYear = "896BBY"),
+                sampleCharacter.copy(id = 3, name = "Rey", birthYear = "15ABY"),
+                sampleCharacter.copy(id = 4, name = "Mystery", birthYear = "unknown")
+            )
+        )
+        val viewModel = createViewModel(repo)
+
+        viewModel.onSortOptionChange(CharacterSortOption.BirthYearAscending)
+
+        assertThat(viewModel.state.value.displayedCharacters.map { it.name })
+            .containsExactly("Yoda", "Luke Skywalker", "Rey", "Mystery")
     }
 
     private fun createViewModel(repo: FakeCharacterRepository) =

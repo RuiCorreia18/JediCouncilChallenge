@@ -178,19 +178,6 @@ fun StarWarsNavGraph(
                             .clip(CircleShape)
                     )
                 }
-
-                // Logout
-                Text(
-                    text = stringResource(R.string.nav_logout),
-                    color = StarWarsColors.Yellow,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Black,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 3.sp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 32.dp, top = 8.dp)
-                )
             }
         }
     ) {

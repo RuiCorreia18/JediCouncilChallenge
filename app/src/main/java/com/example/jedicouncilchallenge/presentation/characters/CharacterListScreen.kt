@@ -50,6 +50,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -103,6 +104,13 @@ fun CharacterListScreen(
     onLoadMore: () -> Unit,
     onRetry: () -> Unit
 ) {
+    if (state.isLoading) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = StarWarsColors.Yellow)
+        }
+        return
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
         SearchAndSortRow(
             query = state.searchQuery,
@@ -122,24 +130,23 @@ fun CharacterListScreen(
             )
         }
 
-        Box(modifier = Modifier.weight(1f)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
             when {
-                state.isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = StarWarsColors.Yellow
-                    )
-                }
                 state.error != null -> {
                     val context = LocalContext.current
                     ErrorState(
                         message = state.error.asString(context),
                         onRetry = onRetry,
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
                 state.displayedCharacters.isEmpty() -> {
-                    EmptyState(modifier = Modifier.align(Alignment.Center))
+                    EmptyState(modifier = Modifier.fillMaxWidth())
                 }
                 else -> {
                     val listState = rememberLazyListState()
@@ -514,14 +521,18 @@ private fun ErrorState(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.padding(16.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
             text = message,
+            modifier = Modifier.fillMaxWidth(),
             color = StarWarsColors.Error,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center
         )
         Button(
             onClick = onRetry,
@@ -539,9 +550,10 @@ private fun ErrorState(
 private fun EmptyState(modifier: Modifier = Modifier) {
     Text(
         text = stringResource(R.string.empty_no_characters),
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         color = StarWarsColors.TextSecondary,
-        style = MaterialTheme.typography.bodyLarge
+        style = MaterialTheme.typography.bodyLarge,
+        textAlign = TextAlign.Center
     )
 }
 

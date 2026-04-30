@@ -81,20 +81,19 @@ fun CharacterDetailScreen(
     onToggleFavourite: () -> Unit,
     onRetry: () -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
         when {
             state.isLoading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
-                    color = StarWarsColors.Yellow
-                )
+                CircularProgressIndicator(color = StarWarsColors.Yellow)
             }
             state.error != null -> {
                 val context = LocalContext.current
                 ErrorState(
                     message = state.error.asString(context),
-                    onRetry = onRetry,
-                    modifier = Modifier.align(Alignment.Center)
+                    onRetry = onRetry
                 )
             }
             state.character != null -> {

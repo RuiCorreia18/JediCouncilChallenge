@@ -34,6 +34,7 @@
     <string name="filter_label_species">Species</string>
     <string name="filter_label_gender">Gender</string>
     <string name="filter_all">All %s</string>
+    <string name="filter_any">Any</string>
     <string name="sort_label_name">Name</string>
 
     <!-- Content descriptions -->
@@ -42,6 +43,7 @@
     <string name="cd_remove_favourite">Remove from favourites</string>
     <string name="cd_select_character">Select character</string>
     <string name="cd_clear">Clear</string>
+    <string name="cd_sort_characters">Sort characters</string>
 
     <!-- Empty states -->
     <string name="empty_no_characters">No characters found</string>
@@ -68,6 +70,21 @@
     <string name="label_mass">Mass</string>
     <string name="label_eyes">Eyes</string>
     <string name="label_hair">Hair</string>
+
+    <!-- Homeworld detail labels -->
+    <string name="label_climate">Climate</string>
+    <string name="label_terrain">Terrain</string>
+    <string name="label_population">Population</string>
+
+    <!-- Starship detail labels -->
+    <string name="label_model">Model</string>
+    <string name="label_manufacturer">Manufacturer</string>
+    <string name="label_class">Class</string>
+
+    <!-- Section titles for detail expansions -->
+    <string name="section_homeworld">HOMEWORLD</string>
+    <string name="section_starships">STARSHIPS</string>
+    <string name="section_no_starships">NO STARSHIPS ON RECORD</string>
 
     <!-- Compare stat labels (all-caps, shown as column headers) -->
     <string name="stat_birth_year">BIRTH YEAR</string>

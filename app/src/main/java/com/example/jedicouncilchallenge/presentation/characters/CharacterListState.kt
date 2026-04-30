@@ -19,8 +19,10 @@ data class CharacterListState(
 )
 
 enum class CharacterSortOption(val label: String) {
-    NameAscending("A-Z"),
-    NameDescending("Z-A")
+    NameAscending("Name A-Z"),
+    NameDescending("Name Z-A"),
+    BirthYearAscending("Year Oldest"),
+    BirthYearDescending("Year Newest")
 }
 
 data class CharacterUi(

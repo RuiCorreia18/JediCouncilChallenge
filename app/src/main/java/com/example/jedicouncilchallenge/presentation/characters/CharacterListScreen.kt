@@ -15,19 +15,19 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +36,9 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -98,33 +101,23 @@ fun CharacterListScreen(
     onRetry: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        SearchBar(
+        SearchAndSortRow(
             query = state.searchQuery,
-            onQueryChange = onSearchQueryChange
+            selectedSort = state.sortOption,
+            onQueryChange = onSearchQueryChange,
+            onSortSelect = onSortOptionChange
         )
 
-        if (state.availableSpecies.isNotEmpty()) {
-            FilterRow(
-                label = stringResource(R.string.filter_label_species),
-                options = state.availableSpecies,
-                selected = state.selectedSpecies,
-                onSelect = onSpeciesFilterChange
+        if (state.availableSpecies.isNotEmpty() || state.availableGenders.isNotEmpty()) {
+            FilterControlsRow(
+                speciesOptions = state.availableSpecies,
+                selectedSpecies = state.selectedSpecies,
+                onSpeciesSelect = onSpeciesFilterChange,
+                genderOptions = state.availableGenders,
+                selectedGender = state.selectedGender,
+                onGenderSelect = onGenderFilterChange
             )
         }
-
-        if (state.availableGenders.isNotEmpty()) {
-            FilterRow(
-                label = stringResource(R.string.filter_label_gender),
-                options = state.availableGenders,
-                selected = state.selectedGender,
-                onSelect = onGenderFilterChange
-            )
-        }
-
-        SortControl(
-            selected = state.sortOption,
-            onSelect = onSortOptionChange
-        )
 
         Box(modifier = Modifier.weight(1f)) {
             when {
@@ -196,78 +189,30 @@ fun CharacterListScreen(
 }
 
 @Composable
-private fun SortControl(
-    selected: CharacterSortOption,
-    onSelect: (CharacterSortOption) -> Unit,
+private fun SearchAndSortRow(
+    query: String,
+    selectedSort: CharacterSortOption,
+    onQueryChange: (String) -> Unit,
+    onSortSelect: (CharacterSortOption) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val shape = RoundedCornerShape(22.dp)
-
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clip(shape)
-            .background(StarWarsColors.SurfaceOverlay)
-            .border(1.dp, StarWarsColors.Yellow.copy(alpha = 0.55f), shape)
-            .padding(6.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = Icons.Filled.SortByAlpha,
-            contentDescription = null,
-            tint = StarWarsColors.Yellow,
-            modifier = Modifier
-                .padding(start = 10.dp)
-                .size(20.dp)
+        SearchBar(
+            query = query,
+            onQueryChange = onQueryChange,
+            modifier = Modifier.weight(1f)
         )
-        Text(
-            text = stringResource(R.string.sort_label_name),
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .weight(1f),
-            color = Color.White,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+        SortMenu(
+            selected = selectedSort,
+            onSelect = onSortSelect
         )
-        CharacterSortOption.entries.forEach { option ->
-            SortSegment(
-                option = option,
-                selected = selected == option,
-                onClick = { onSelect(option) }
-            )
-        }
     }
-}
-
-@Composable
-private fun SortSegment(
-    option: CharacterSortOption,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val shape = RoundedCornerShape(16.dp)
-    Text(
-        text = option.label,
-        modifier = modifier
-            .padding(start = 4.dp)
-            .clip(shape)
-            .background(if (selected) StarWarsColors.Yellow else Color.Transparent)
-            .border(
-                width = 1.dp,
-                color = if (selected) StarWarsColors.Yellow else StarWarsColors.TextSecondary,
-                shape = shape
-            )
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 8.dp),
-        color = if (selected) StarWarsColors.Black else Color.White,
-        style = MaterialTheme.typography.labelLarge,
-        fontWeight = FontWeight.Black,
-        maxLines = 1
-    )
 }
 
 @Composable
@@ -280,21 +225,20 @@ private fun SearchBar(
         value = query,
         onValueChange = onQueryChange,
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .fillMaxWidth(),
         placeholder = {
             Text(
                 stringResource(R.string.search_hint_characters),
-                color = StarWarsColors.TextSecondary
+                color = Color.Black.copy(alpha = 0.55f)
             )
         },
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = StarWarsColors.SurfaceOverlay,
-            unfocusedContainerColor = StarWarsColors.SurfaceOverlay,
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            focusedTextColor = StarWarsColors.Black,
+            unfocusedTextColor = StarWarsColors.Black,
             cursorColor = StarWarsColors.Yellow,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
@@ -303,38 +247,186 @@ private fun SearchBar(
 }
 
 @Composable
-private fun FilterRow(
+private fun SortMenu(
+    selected: CharacterSortOption,
+    onSelect: (CharacterSortOption) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val shape = RoundedCornerShape(12.dp)
+
+    Box(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .height(56.dp)
+                .clip(shape)
+                .background(StarWarsColors.Yellow)
+                .border(1.dp, StarWarsColors.Black.copy(alpha = 0.45f), shape)
+                .clickable { expanded = true }
+                .padding(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.SortByAlpha,
+                contentDescription = stringResource(R.string.cd_sort_characters),
+                tint = StarWarsColors.Black,
+                modifier = Modifier.size(20.dp)
+            )
+            Text(
+                text = selected.label,
+                color = StarWarsColors.Black,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Black,
+                maxLines = 1
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(Color.White)
+        ) {
+            CharacterSortOption.entries.forEach { option ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = option.label,
+                            color = StarWarsColors.Black,
+                            fontWeight = if (selected == option) FontWeight.Black else FontWeight.Normal
+                        )
+                    },
+                    onClick = {
+                        expanded = false
+                        onSelect(option)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FilterControlsRow(
+    speciesOptions: List<String>,
+    selectedSpecies: String?,
+    onSpeciesSelect: (String?) -> Unit,
+    genderOptions: List<String>,
+    selectedGender: String?,
+    onGenderSelect: (String?) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        FilterMenuButton(
+            label = stringResource(R.string.filter_label_species),
+            options = speciesOptions,
+            selected = selectedSpecies,
+            onSelect = onSpeciesSelect,
+            modifier = Modifier.weight(1f)
+        )
+        FilterMenuButton(
+            label = stringResource(R.string.filter_label_gender),
+            options = genderOptions,
+            selected = selectedGender,
+            onSelect = onGenderSelect,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun FilterMenuButton(
     label: String,
     options: List<String>,
     selected: String?,
     onSelect: (String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyRow(
-        modifier = modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item {
-            FilterChip(
-                selected = selected == null,
-                onClick = { onSelect(null) },
-                label = { Text(stringResource(R.string.filter_all, label)) },
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = StarWarsColors.Yellow,
-                    selectedLabelColor = StarWarsColors.Black
-                )
+    var expanded by remember { mutableStateOf(false) }
+    val shape = RoundedCornerShape(12.dp)
+    val isActive = selected != null
+    val containerColor = if (isActive) StarWarsColors.Yellow else StarWarsColors.SurfaceOverlay
+    val contentColor = if (isActive) StarWarsColors.Black else Color.White
+    val borderColor =
+        if (isActive) StarWarsColors.Yellow else StarWarsColors.Yellow.copy(alpha = 0.5f)
+
+    Box(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .clip(shape)
+                .background(containerColor)
+                .border(1.dp, borderColor, shape)
+                .clickable(enabled = options.isNotEmpty()) { expanded = true }
+                .padding(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.FilterList,
+                contentDescription = null,
+                tint = contentColor,
+                modifier = Modifier.size(18.dp)
             )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = label,
+                    color = contentColor.copy(alpha = if (isActive) 0.7f else 0.85f),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
+                Text(
+                    text = selected ?: stringResource(R.string.filter_any),
+                    color = contentColor,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
-        items(options) { option ->
-            FilterChip(
-                selected = selected == option,
-                onClick = { onSelect(option) },
-                label = { Text(option) },
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = StarWarsColors.Yellow,
-                    selectedLabelColor = StarWarsColors.Black
-                )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(Color.White)
+        ) {
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = stringResource(R.string.filter_all, label),
+                        color = StarWarsColors.Black,
+                        fontWeight = if (selected == null) FontWeight.Black else FontWeight.Normal
+                    )
+                },
+                onClick = {
+                    expanded = false
+                    onSelect(null)
+                }
             )
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = option,
+                            color = StarWarsColors.Black,
+                            fontWeight = if (selected == option) FontWeight.Black else FontWeight.Normal
+                        )
+                    },
+                    onClick = {
+                        expanded = false
+                        onSelect(option)
+                    }
+                )
+            }
         }
     }
 }

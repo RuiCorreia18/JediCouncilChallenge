@@ -140,6 +140,17 @@ class CharacterListViewModel @Inject constructor(
             when (sortOption) {
                 CharacterSortOption.NameAscending -> characters.sortedBy { it.name }
                 CharacterSortOption.NameDescending -> characters.sortedByDescending { it.name }
+                CharacterSortOption.BirthYearAscending -> characters.sortedWith(
+                    compareBy<Character> { it.birthYear.timelineYear() ?: Double.POSITIVE_INFINITY }
+                        .thenBy { it.name }
+                )
+
+                CharacterSortOption.BirthYearDescending -> characters.sortedWith(
+                    compareByDescending<Character> {
+                        it.birthYear.timelineYear() ?: Double.NEGATIVE_INFINITY
+                    }
+                        .thenBy { it.name }
+                )
             }
         }
 
@@ -158,4 +169,18 @@ class CharacterListViewModel @Inject constructor(
         imageUrl = characterImageUrl(id),
         speciesName = speciesIds.firstOrNull()?.let { speciesMap[it] } ?: "Unknown"
     )
+
+    private fun String.timelineYear(): Double? {
+        val normalized = trim().uppercase()
+        val year = normalized
+            .removeSuffix("BBY")
+            .removeSuffix("ABY")
+            .toDoubleOrNull() ?: return null
+
+        return when {
+            normalized.endsWith("BBY") -> -year
+            normalized.endsWith("ABY") -> year
+            else -> null
+        }
+    }
 }

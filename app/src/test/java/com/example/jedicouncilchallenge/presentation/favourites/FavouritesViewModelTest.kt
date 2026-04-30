@@ -3,13 +3,14 @@ package com.example.jedicouncilchallenge.presentation.favourites
 import assertk.assertThat
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
-import assertk.assertions.isNotNull
 import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
+import assertk.assertions.isNotNull
 import com.example.jedicouncilchallenge.core.domain.DataError
 import com.example.jedicouncilchallenge.domain.model.Character
 import com.example.jedicouncilchallenge.domain.model.FavouriteRef
 import com.example.jedicouncilchallenge.domain.model.FavouriteType
+import com.example.jedicouncilchallenge.domain.usecase.GetCharactersUseCase
 import com.example.jedicouncilchallenge.domain.usecase.ToggleFavouriteUseCase
 import com.example.jedicouncilchallenge.fake.FakeCharacterRepository
 import kotlinx.coroutines.Dispatchers
@@ -81,6 +82,7 @@ class FavouritesViewModelTest {
     private fun createViewModel(repo: FakeCharacterRepository) =
         FavouritesViewModel(
             repository = repo,
+            getCharacters = GetCharactersUseCase(repo),
             toggleFavourite = ToggleFavouriteUseCase(repo)
         )
 }

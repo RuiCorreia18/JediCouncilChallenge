@@ -4,13 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jedicouncilchallenge.core.domain.Result
 import com.example.jedicouncilchallenge.core.presentation.toUiText
-import com.example.jedicouncilchallenge.core.presentation.UiText
 import com.example.jedicouncilchallenge.domain.model.Character
-import com.example.jedicouncilchallenge.domain.repository.CharacterRepository
+import com.example.jedicouncilchallenge.domain.usecase.GetCharactersUseCase
 import com.example.jedicouncilchallenge.presentation.images.characterImageUrl
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -19,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CompareViewModel @Inject constructor(
-    private val repository: CharacterRepository
+    private val getCharacters: GetCharactersUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CompareState(isLoading = true))
@@ -122,24 +119,16 @@ class CompareViewModel @Inject constructor(
     private fun loadCharacters() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
-            try {
-                val (chars, speciesList) = coroutineScope {
-                    val charsDeferred = async { repository.getCharacters() }
-                    val speciesDeferred = async { repository.getSpecies() }
-                    charsDeferred.await() to speciesDeferred.await()
+            when (val result = getCharacters()) {
+                is Result.Success -> {
+                    val speciesMap = result.data.species.associate { it.id to it.name }
+                    characters = result.data.characters.map { it.toCompareCharacterUi(speciesMap) }
+                    _state.update { it.copy(isLoading = false) }
                 }
-                if (chars is Result.Error) {
-                    _state.update { it.copy(isLoading = false, error = chars.error.toUiText()) }
-                    return@launch
+
+                is Result.Error -> _state.update {
+                    it.copy(isLoading = false, error = result.error.toUiText())
                 }
-                val speciesMap: Map<Int, String> = when (speciesList) {
-                    is Result.Success -> speciesList.data.associate { it.id to it.name }
-                    is Result.Error -> emptyMap()
-                }
-                characters = (chars as Result.Success).data.map { it.toCompareCharacterUi(speciesMap) }
-                _state.update { it.copy(isLoading = false) }
-            } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, error = UiText.DynamicString(e.message ?: "Unknown error")) }
             }
         }
     }

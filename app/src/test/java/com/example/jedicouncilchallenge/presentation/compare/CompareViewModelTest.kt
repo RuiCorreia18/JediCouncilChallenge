@@ -7,6 +7,7 @@ import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.example.jedicouncilchallenge.core.domain.DataError
 import com.example.jedicouncilchallenge.domain.model.Character
+import com.example.jedicouncilchallenge.domain.usecase.GetCharactersUseCase
 import com.example.jedicouncilchallenge.fake.FakeCharacterRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -34,7 +35,7 @@ class CompareViewModelTest {
     @Test
     fun `characters load on init`() = runTest {
         val repo = FakeCharacterRepository(characters = listOf(luke, leia))
-        val viewModel = CompareViewModel(repo)
+        val viewModel = CompareViewModel(GetCharactersUseCase(repo))
 
         viewModel.openLeftPicker()
         assertThat(viewModel.state.value.leftSuggestions).isNotNull()
@@ -44,7 +45,7 @@ class CompareViewModelTest {
     @Test
     fun `selected left character is excluded from right suggestions`() = runTest {
         val repo = FakeCharacterRepository(characters = listOf(luke, leia))
-        val viewModel = CompareViewModel(repo)
+        val viewModel = CompareViewModel(GetCharactersUseCase(repo))
 
         viewModel.openLeftPicker()
         val lukeUi = viewModel.state.value.leftSuggestions.first { it.id == luke.id }
@@ -57,7 +58,7 @@ class CompareViewModelTest {
     @Test
     fun `selected right character is excluded from left suggestions`() = runTest {
         val repo = FakeCharacterRepository(characters = listOf(luke, leia))
-        val viewModel = CompareViewModel(repo)
+        val viewModel = CompareViewModel(GetCharactersUseCase(repo))
 
         viewModel.openRightPicker()
         val leiaUi = viewModel.state.value.rightSuggestions.first { it.id == leia.id }
@@ -70,7 +71,7 @@ class CompareViewModelTest {
     @Test
     fun `compare sets isComparing and clearLeft resets it`() = runTest {
         val repo = FakeCharacterRepository(characters = listOf(luke, leia))
-        val viewModel = CompareViewModel(repo)
+        val viewModel = CompareViewModel(GetCharactersUseCase(repo))
 
         viewModel.openLeftPicker()
         viewModel.selectLeft(viewModel.state.value.leftSuggestions.first { it.id == luke.id })
@@ -88,7 +89,7 @@ class CompareViewModelTest {
     @Test
     fun `network error sets error state`() = runTest {
         val repo = FakeCharacterRepository(networkError = DataError.Network.NO_INTERNET)
-        val viewModel = CompareViewModel(repo)
+        val viewModel = CompareViewModel(GetCharactersUseCase(repo))
 
         assertThat(viewModel.state.value.error).isNotNull()
         assertThat(viewModel.state.value.isLoading).isFalse()

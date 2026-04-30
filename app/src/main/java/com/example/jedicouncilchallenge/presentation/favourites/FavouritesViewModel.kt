@@ -8,6 +8,7 @@ import com.example.jedicouncilchallenge.domain.model.Character
 import com.example.jedicouncilchallenge.domain.model.FavouriteRef
 import com.example.jedicouncilchallenge.domain.model.FavouriteType
 import com.example.jedicouncilchallenge.domain.repository.CharacterRepository
+import com.example.jedicouncilchallenge.domain.usecase.GetCharactersUseCase
 import com.example.jedicouncilchallenge.domain.usecase.ToggleFavouriteUseCase
 import com.example.jedicouncilchallenge.presentation.images.characterImageUrl
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +27,7 @@ sealed interface FavouritesEvent {
 @HiltViewModel
 class FavouritesViewModel @Inject constructor(
     private val repository: CharacterRepository,
+    private val getCharacters: GetCharactersUseCase,
     private val toggleFavourite: ToggleFavouriteUseCase
 ) : ViewModel() {
 
@@ -62,9 +64,9 @@ class FavouritesViewModel @Inject constructor(
     private fun loadCharacters() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
-            when (val result = repository.getCharacters()) {
+            when (val result = getCharacters()) {
                 is Result.Success -> {
-                    allCharacters = result.data
+                    allCharacters = result.data.characters
                     _state.update { it.copy(isLoading = false) }
                     updateFavouriteCharacters()
                 }

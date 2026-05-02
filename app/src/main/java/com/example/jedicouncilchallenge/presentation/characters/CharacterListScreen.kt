@@ -134,7 +134,7 @@ fun CharacterListScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.TopStart
         ) {
             when {
                 state.error != null -> {

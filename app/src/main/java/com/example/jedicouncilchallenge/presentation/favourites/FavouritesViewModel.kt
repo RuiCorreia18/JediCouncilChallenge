@@ -7,8 +7,8 @@ import com.example.jedicouncilchallenge.core.presentation.toUiText
 import com.example.jedicouncilchallenge.domain.model.Character
 import com.example.jedicouncilchallenge.domain.model.FavouriteRef
 import com.example.jedicouncilchallenge.domain.model.FavouriteType
-import com.example.jedicouncilchallenge.domain.repository.CharacterRepository
 import com.example.jedicouncilchallenge.domain.usecase.GetCharactersUseCase
+import com.example.jedicouncilchallenge.domain.usecase.GetFavouritesUseCase
 import com.example.jedicouncilchallenge.domain.usecase.ToggleFavouriteUseCase
 import com.example.jedicouncilchallenge.presentation.images.characterImageUrl
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,8 +26,8 @@ sealed interface FavouritesEvent {
 
 @HiltViewModel
 class FavouritesViewModel @Inject constructor(
-    private val repository: CharacterRepository,
     private val getCharacters: GetCharactersUseCase,
+    private val getFavourites: GetFavouritesUseCase,
     private val toggleFavourite: ToggleFavouriteUseCase
 ) : ViewModel() {
 
@@ -79,8 +79,8 @@ class FavouritesViewModel @Inject constructor(
 
     private fun observeFavourites() {
         viewModelScope.launch {
-            repository.observeFavouriteCharacterIds().collect { ids ->
-                favouriteCharacterIds = ids
+            getFavourites().collect { refs ->
+                favouriteCharacterIds = refs.characterIds()
                 updateFavouriteCharacters()
             }
         }
@@ -102,4 +102,7 @@ class FavouritesViewModel @Inject constructor(
         name = name,
         imageUrl = characterImageUrl(id)
     )
+
+    private fun Set<FavouriteRef>.characterIds(): Set<Int> =
+        filter { it.type == FavouriteType.CHARACTER }.map { it.id }.toSet()
 }

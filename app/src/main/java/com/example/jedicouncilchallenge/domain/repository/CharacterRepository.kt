@@ -4,12 +4,10 @@ import com.example.jedicouncilchallenge.core.domain.DataError
 import com.example.jedicouncilchallenge.core.domain.Result
 import com.example.jedicouncilchallenge.domain.model.Character
 import com.example.jedicouncilchallenge.domain.model.FavouriteRef
-import com.example.jedicouncilchallenge.domain.model.FavouriteType
 import com.example.jedicouncilchallenge.domain.model.Planet
 import com.example.jedicouncilchallenge.domain.model.Species
 import com.example.jedicouncilchallenge.domain.model.Starship
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 /**
  * Single source of truth for all Star Wars data.
@@ -35,12 +33,6 @@ interface CharacterRepository {
 
     fun observeFavourites(): Flow<Set<FavouriteRef>>
     suspend fun toggleFavourite(ref: FavouriteRef)
-
-    /** Convenience filter on [observeFavourites] — emits only character IDs. */
-    fun observeFavouriteCharacterIds(): Flow<Set<Int>> =
-        observeFavourites().map { refs ->
-            refs.filter { it.type == FavouriteType.CHARACTER }.map { it.id }.toSet()
-        }
 
     fun observeDarthVaderMode(): Flow<Boolean>
     suspend fun setDarthVaderMode(enabled: Boolean)

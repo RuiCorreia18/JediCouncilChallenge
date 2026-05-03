@@ -10,6 +10,7 @@ import com.example.jedicouncilchallenge.domain.model.Character
 import com.example.jedicouncilchallenge.domain.usecase.GetCharactersUseCase
 import com.example.jedicouncilchallenge.fake.FakeCharacterRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class CompareViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()

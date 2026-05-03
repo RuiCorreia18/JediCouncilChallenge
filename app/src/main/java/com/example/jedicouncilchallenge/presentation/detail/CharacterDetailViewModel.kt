@@ -6,8 +6,8 @@ import com.example.jedicouncilchallenge.core.domain.Result
 import com.example.jedicouncilchallenge.core.presentation.toUiText
 import com.example.jedicouncilchallenge.domain.model.FavouriteRef
 import com.example.jedicouncilchallenge.domain.model.FavouriteType
-import com.example.jedicouncilchallenge.domain.repository.CharacterRepository
 import com.example.jedicouncilchallenge.domain.usecase.GetCharacterDetailUseCase
+import com.example.jedicouncilchallenge.domain.usecase.GetFavouritesUseCase
 import com.example.jedicouncilchallenge.domain.usecase.ToggleFavouriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class CharacterDetailViewModel @Inject constructor(
     private val getCharacterDetail: GetCharacterDetailUseCase,
     private val toggleFavourite: ToggleFavouriteUseCase,
-    private val repository: CharacterRepository
+    private val getFavourites: GetFavouritesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CharacterDetailState())
@@ -68,9 +68,12 @@ class CharacterDetailViewModel @Inject constructor(
     private fun observeFavourite(characterId: Int) {
         favouriteJob?.cancel()
         favouriteJob = viewModelScope.launch {
-            repository.observeFavouriteCharacterIds().collect { ids ->
-                _state.update { it.copy(isFavourite = characterId in ids) }
+            getFavourites().collect { refs ->
+                _state.update { it.copy(isFavourite = refs.hasCharacter(characterId)) }
             }
         }
     }
+
+    private fun Set<FavouriteRef>.hasCharacter(characterId: Int): Boolean =
+        any { it.type == FavouriteType.CHARACTER && it.id == characterId }
 }

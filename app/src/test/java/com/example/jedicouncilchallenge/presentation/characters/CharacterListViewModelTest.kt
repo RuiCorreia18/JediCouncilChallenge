@@ -10,9 +10,11 @@ import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.example.jedicouncilchallenge.domain.model.Character
 import com.example.jedicouncilchallenge.domain.usecase.GetCharactersUseCase
+import com.example.jedicouncilchallenge.domain.usecase.GetFavouritesUseCase
 import com.example.jedicouncilchallenge.domain.usecase.ToggleFavouriteUseCase
 import com.example.jedicouncilchallenge.fake.FakeCharacterRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class CharacterListViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -119,7 +122,7 @@ class CharacterListViewModelTest {
         CharacterListViewModel(
             getCharacters = GetCharactersUseCase(repo),
             toggleFavourite = ToggleFavouriteUseCase(repo),
-            repository = repo
+            getFavourites = GetFavouritesUseCase(repo)
         )
 }
 

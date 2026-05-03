@@ -7,8 +7,8 @@ import com.example.jedicouncilchallenge.core.presentation.toUiText
 import com.example.jedicouncilchallenge.domain.model.Character
 import com.example.jedicouncilchallenge.domain.model.FavouriteRef
 import com.example.jedicouncilchallenge.domain.model.FavouriteType
-import com.example.jedicouncilchallenge.domain.repository.CharacterRepository
 import com.example.jedicouncilchallenge.domain.usecase.GetCharactersUseCase
+import com.example.jedicouncilchallenge.domain.usecase.GetFavouritesUseCase
 import com.example.jedicouncilchallenge.domain.usecase.ToggleFavouriteUseCase
 import com.example.jedicouncilchallenge.presentation.images.characterImageUrl
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +30,7 @@ private const val PAGE_SIZE = 20
 class CharacterListViewModel @Inject constructor(
     private val getCharacters: GetCharactersUseCase,
     private val toggleFavourite: ToggleFavouriteUseCase,
-    private val repository: CharacterRepository
+    private val getFavourites: GetFavouritesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CharacterListState())
@@ -116,8 +116,8 @@ class CharacterListViewModel @Inject constructor(
 
     private fun observeFavourites() {
         viewModelScope.launch {
-            repository.observeFavouriteCharacterIds().collect { ids ->
-                _state.update { it.copy(favouriteCharacterIds = ids) }
+            getFavourites().collect { refs ->
+                _state.update { it.copy(favouriteCharacterIds = refs.characterIds()) }
             }
         }
     }
@@ -183,4 +183,7 @@ class CharacterListViewModel @Inject constructor(
             else -> null
         }
     }
+
+    private fun Set<FavouriteRef>.characterIds(): Set<Int> =
+        filter { it.type == FavouriteType.CHARACTER }.map { it.id }.toSet()
 }

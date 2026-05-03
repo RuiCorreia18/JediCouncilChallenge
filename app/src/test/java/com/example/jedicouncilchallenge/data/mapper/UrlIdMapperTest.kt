@@ -3,6 +3,7 @@ package com.example.jedicouncilchallenge.data.mapper
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNull
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.Test
 
 class UrlIdMapperTest {
@@ -18,8 +19,10 @@ class UrlIdMapperTest {
     }
 
     @Test
-    fun `resourceId returns 0 for malformed url`() {
-        assertThat("not-a-url".resourceId()).isEqualTo(0)
+    fun `resourceId fails for malformed url`() {
+        assertThrows<IllegalStateException> {
+            "not-a-url".resourceId()
+        }
     }
 
     @Test

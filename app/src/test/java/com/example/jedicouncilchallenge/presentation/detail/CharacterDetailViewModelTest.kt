@@ -10,9 +10,11 @@ import com.example.jedicouncilchallenge.core.domain.DataError
 import com.example.jedicouncilchallenge.domain.model.Character
 import com.example.jedicouncilchallenge.domain.model.Planet
 import com.example.jedicouncilchallenge.domain.usecase.GetCharacterDetailUseCase
+import com.example.jedicouncilchallenge.domain.usecase.GetFavouritesUseCase
 import com.example.jedicouncilchallenge.domain.usecase.ToggleFavouriteUseCase
 import com.example.jedicouncilchallenge.fake.FakeCharacterRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class CharacterDetailViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -100,7 +103,7 @@ class CharacterDetailViewModelTest {
         CharacterDetailViewModel(
             getCharacterDetail = GetCharacterDetailUseCase(repo),
             toggleFavourite = ToggleFavouriteUseCase(repo),
-            repository = repo
+            getFavourites = GetFavouritesUseCase(repo)
         )
 }
 

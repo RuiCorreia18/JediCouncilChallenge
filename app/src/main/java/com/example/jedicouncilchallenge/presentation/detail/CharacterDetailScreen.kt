@@ -190,7 +190,7 @@ private fun CharacterDetailContent(
             CenteredFactRows(
                 rows = listOf(
                     stringResource(R.string.label_gender) to character.gender.displayValue(),
-                    stringResource(R.string.label_height) to character.height.withUnit("meters"),
+                    stringResource(R.string.label_height) to character.height.withUnit("centimeters"),
                     stringResource(R.string.label_mass) to character.mass.withUnit("kilograms"),
                     stringResource(R.string.label_eyes) to character.eyeColor.displayValue(),
                     stringResource(R.string.label_hair) to character.hairColor.displayValue()
@@ -384,7 +384,7 @@ private fun Character.storySummary(homeworldName: String?, starshipCount: Int): 
 
     return "$name is a ${gender.displayValue()} figure from $homeworld. " +
         "Archive records list a birth year of ${birthYear.displayValue()}, " +
-        "a height of ${height.withUnit("meters")}, and a mass of ${mass.withUnit("kilograms")}. " +
+        "a height of ${height.withUnit("centimeters")}, and a mass of ${mass.withUnit("kilograms")}. " +
         starshipText
 }
 

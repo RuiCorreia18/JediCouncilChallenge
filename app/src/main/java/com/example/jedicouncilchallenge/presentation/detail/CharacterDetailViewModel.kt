@@ -10,10 +10,10 @@ import com.example.jedicouncilchallenge.domain.usecase.GetCharacterDetailUseCase
 import com.example.jedicouncilchallenge.domain.usecase.GetFavouritesUseCase
 import com.example.jedicouncilchallenge.domain.usecase.ToggleFavouriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,13 +29,25 @@ class CharacterDetailViewModel @Inject constructor(
 
     private var currentCharacterId: Int? = null
     private var favouriteJob: Job? = null
+    private var loadJob: Job? = null
 
-    fun loadCharacter(characterId: Int) {
-        if (currentCharacterId == characterId && _state.value.character != null) return
+    fun loadCharacter(characterId: Int) = loadCharacter(characterId, forceReload = false)
+
+    private fun loadCharacter(characterId: Int, forceReload: Boolean) {
+        if (!forceReload && currentCharacterId == characterId && _state.value.character?.id == characterId) return
         currentCharacterId = characterId
 
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null) }
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    character = null,
+                    homeworld = null,
+                    starships = emptyList(),
+                    isLoading = true,
+                    error = null
+                )
+            }
             when (val result = getCharacterDetail(characterId)) {
                 is Result.Success -> _state.update {
                     it.copy(
@@ -55,7 +67,7 @@ class CharacterDetailViewModel @Inject constructor(
     }
 
     fun retry() {
-        currentCharacterId?.let(::loadCharacter)
+        currentCharacterId?.let { loadCharacter(it, forceReload = true) }
     }
 
     fun toggleFavourite() {

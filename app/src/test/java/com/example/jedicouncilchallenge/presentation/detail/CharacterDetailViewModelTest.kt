@@ -7,6 +7,7 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.example.jedicouncilchallenge.core.domain.DataError
+import com.example.jedicouncilchallenge.core.domain.Result
 import com.example.jedicouncilchallenge.domain.model.Character
 import com.example.jedicouncilchallenge.domain.model.Planet
 import com.example.jedicouncilchallenge.domain.usecase.GetCharacterDetailUseCase
@@ -82,6 +83,37 @@ class CharacterDetailViewModelTest {
 
         assertThat(viewModel.state.value.error).isNotNull()
         assertThat(viewModel.state.value.isLoading).isFalse()
+    }
+
+    @Test
+    fun `retry after failed navigation clears stale character and reloads same id`() = runTest {
+        val secondCharacter = sampleCharacter.copy(id = 2, name = "Leia Organa")
+        var shouldFailSecondCharacter = true
+        val repo = object : FakeCharacterRepository(
+            characters = listOf(sampleCharacter, secondCharacter),
+            planets = listOf(samplePlanet)
+        ) {
+            override suspend fun getCharacter(id: Int): Result<Character, DataError.Network> {
+                if (id == secondCharacter.id && shouldFailSecondCharacter) {
+                    return Result.Error(DataError.Network.NO_INTERNET)
+                }
+                return super.getCharacter(id)
+            }
+        }
+        val viewModel = createViewModel(repo)
+
+        viewModel.loadCharacter(sampleCharacter.id)
+        assertThat(viewModel.state.value.character).isEqualTo(sampleCharacter)
+
+        viewModel.loadCharacter(secondCharacter.id)
+        assertThat(viewModel.state.value.character).isNull()
+        assertThat(viewModel.state.value.error).isNotNull()
+
+        shouldFailSecondCharacter = false
+        viewModel.retry()
+
+        assertThat(viewModel.state.value.error).isNull()
+        assertThat(viewModel.state.value.character).isEqualTo(secondCharacter)
     }
 
     @Test

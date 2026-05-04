@@ -18,6 +18,8 @@ import com.example.jedicouncilchallenge.domain.model.Starship
 import com.example.jedicouncilchallenge.domain.repository.CharacterRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 class CharacterRepositoryImpl @Inject constructor(
@@ -26,29 +28,38 @@ class CharacterRepositoryImpl @Inject constructor(
     private val themePreferences: ThemePreferences
 ) : CharacterRepository {
 
+    // The repository is bound as @Singleton, so these caches are shared across coroutines.
+    // The mutex serialises cache reads and writes — without it, concurrent callers (e.g. list
+    // init + a deeplinked detail) could race and corrupt the maps or trigger duplicate fetches.
+    private val cacheMutex = Mutex()
     private val planetCache = mutableMapOf<Int, Planet>()
     private val starshipCache = mutableMapOf<Int, Starship>()
     private var characterCache: List<Character> = emptyList()
 
-    override suspend fun getCharacters(): Result<List<Character>, DataError.Network> {
-        if (characterCache.isNotEmpty()) return Result.Success(characterCache)
-        return remoteDataSource.getCharacters().map { list -> list.map { it.toCharacter() } }
-            .also { result ->
-                if (result is Result.Success) characterCache = result.data
-            }
-    }
+    override suspend fun getCharacters(): Result<List<Character>, DataError.Network> =
+        // Hold the lock across the network call: the list is fetched once on startup, so
+        // serialising the first concurrent callers is preferable to two parallel fetches of
+        // the full payload. After the cache fills, every subsequent call short-circuits.
+        cacheMutex.withLock {
+            if (characterCache.isNotEmpty()) return@withLock Result.Success(characterCache)
+            remoteDataSource.getCharacters()
+                .map { list -> list.map { it.toCharacter() } }
+                .also { result ->
+                    if (result is Result.Success) characterCache = result.data
+                }
+        }
 
     override suspend fun getCharacter(id: Int): Result<Character, DataError.Network> {
         // The list endpoint returns the same per-character shape as the per-id endpoint,
         // so we populate the cache via getCharacters() rather than making a redundant per-id call.
-        if (characterCache.isEmpty()) {
+        if (cacheMutex.withLock { characterCache.isEmpty() }) {
             when (val result = getCharacters()) {
-                is Result.Success -> characterCache = result.data
+                is Result.Success -> Unit // cache populated atomically inside getCharacters()
                 is Result.Error -> return result
             }
         }
 
-        return characterCache.firstOrNull { it.id == id }
+        return cacheMutex.withLock { characterCache.firstOrNull { it.id == id } }
             ?.let { Result.Success(it) }
             ?: Result.Error(DataError.Network.NOT_FOUND)
     }
@@ -57,16 +68,22 @@ class CharacterRepositoryImpl @Inject constructor(
         remoteDataSource.getSpecies().map { list -> list.map { it.toSpecies() } }
 
     override suspend fun getPlanet(id: Int): Result<Planet, DataError.Network> {
-        planetCache[id]?.let { return Result.Success(it) }
+        // Lock only for cache read and write — the network fetch runs outside the lock so
+        // parallel detail fetches for different planets/starships don't serialise on each other.
+        cacheMutex.withLock { planetCache[id] }?.let { return Result.Success(it) }
         return remoteDataSource.getPlanet(id).map { it.toPlanet() }.also { result ->
-            if (result is Result.Success) planetCache[id] = result.data
+            if (result is Result.Success) {
+                cacheMutex.withLock { planetCache[id] = result.data }
+            }
         }
     }
 
     override suspend fun getStarship(id: Int): Result<Starship, DataError.Network> {
-        starshipCache[id]?.let { return Result.Success(it) }
+        cacheMutex.withLock { starshipCache[id] }?.let { return Result.Success(it) }
         return remoteDataSource.getStarship(id).map { it.toStarship() }.also { result ->
-            if (result is Result.Success) starshipCache[id] = result.data
+            if (result is Result.Success) {
+                cacheMutex.withLock { starshipCache[id] = result.data }
+            }
         }
     }
 

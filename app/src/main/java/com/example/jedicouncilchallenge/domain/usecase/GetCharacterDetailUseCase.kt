@@ -30,18 +30,25 @@ class GetCharacterDetailUseCase @Inject constructor(
             val starshipDeferreds = character.starshipIds.map { id ->
                 async { repository.getStarship(id) }
             }
+            val detailDeferreds = listOfNotNull(homeworldDeferred) + starshipDeferreds
 
             val homeworld = when (val result = homeworldDeferred?.await()) {
                 null -> null
                 is Result.Success -> result.data
-                is Result.Error -> return@coroutineScope result
+                is Result.Error -> {
+                    detailDeferreds.forEach { it.cancel() }
+                    return@coroutineScope result
+                }
             }
 
             val starships = buildList {
                 for (deferred in starshipDeferreds) {
                     when (val result = deferred.await()) {
                         is Result.Success -> add(result.data)
-                        is Result.Error -> return@coroutineScope result
+                        is Result.Error -> {
+                            detailDeferreds.forEach { it.cancel() }
+                            return@coroutineScope result
+                        }
                     }
                 }
             }

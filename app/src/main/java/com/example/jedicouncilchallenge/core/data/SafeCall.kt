@@ -2,6 +2,7 @@ package com.example.jedicouncilchallenge.core.data
 
 import com.example.jedicouncilchallenge.core.domain.DataError
 import com.example.jedicouncilchallenge.core.domain.Result
+import kotlinx.coroutines.CancellationException
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -21,6 +22,8 @@ suspend inline fun <T> safeCall(execute: () -> T): Result<T, DataError.Network> 
                 else -> DataError.Network.UNKNOWN
             }
         )
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         Result.Error(DataError.Network.UNKNOWN)
     }

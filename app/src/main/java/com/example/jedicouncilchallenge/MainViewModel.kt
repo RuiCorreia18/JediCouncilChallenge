@@ -21,7 +21,7 @@ class MainViewModel @Inject constructor(
 
     fun toggleDarthVaderMode() {
         viewModelScope.launch {
-            toggleTheme(isDarthVaderMode.value)
+            toggleTheme()
         }
     }
 }
